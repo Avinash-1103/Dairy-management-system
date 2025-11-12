@@ -1,4 +1,4 @@
-# 🐄 Shree Ganesh Dairy Management System
+# 🐄 Dairy Management System
 
 ## Project Metadata and Setup Information (v1.0.0)
 
@@ -10,13 +10,13 @@ A complete offline dairy management software built with **Python**, **HTML**, **
 
 | Metadata | Detail |
 | :--- | :--- |
-| **Project Name** | Shree Ganesh Dairy Management System |
+| **Project Name** | Dairy Management System |
 | **Type** | Desktop Application |
-| **Developer** | Harshad Nalawade |
+| **Developer** | Avinash Nalawade |
 | **License** | MIT |
 | **Version** | 1.0.0 |
 | **UI Framework** | PyWebView (Chromium Embedded) |
-| **Executable Name** | ShreeGaneshDairy.exe |
+| **Executable Name** | Varad_Dairy.exe |
 
 ---
 
@@ -143,7 +143,7 @@ version_history:
 
 ## 🧍 Author Information
 
-* **Name:** Harshad Nalawade
-* **GitHub:** https://github.com/HarshadNalawade
+* **Name:** Avinash Nalawade
+* **GitHub:** https://github.com/Avinash-1103
 * **License:** MIT
 * **Quote:** "A modern approach to traditional dairy management 🐄"
