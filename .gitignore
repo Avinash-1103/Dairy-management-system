@@ -1,0 +1,25 @@
+# Ignore compiled EXE, cache, and system files
+__pycache__/
+*.pyc
+*.pyo
+*.log
+*.spec
+*.exe
+dist/
+build/
+*.db
+*.sqlite3
+*.bak
+
+# Ignore PyInstaller temporary folders
+*.manifest
+*.dll
+*.ico
+
+# VS Code / JetBrains configs
+.vscode/
+.idea/
+
+# OS junk
+Thumbs.db
+.DS_Store

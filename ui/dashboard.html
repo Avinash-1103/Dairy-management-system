@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Varad Dairy - Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css" />
+</head>
+
+<body>
+    <div class="topbar">
+        <div class="brand">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAMAAAC6V+0/AAAABlBMVEX///8AAABVwtN+AAAAAXRSTlMAQObYZgAAABlJREFUGNNjYBgFYAACDAwMDAwAABR8A2d+zQxQAAAAAElFTkSuQmCC"
+                alt="logo">
+            <span>Varad Dairy</span>
+        </div>
+
+        <div class="actions">
+            <button class="btn action" id="logoutBtn">Logout</button>
+            <button class="btn action" id="changePasswordBtn">Change Password</button>
+            <button class="btn action" id="startShiftBtn">Start New Shift</button>
+            <button class="btn action" id="openReportsBtn">Open Reports</button>
+            <button class="btn action" id="createMonthlyBtn">Create Monthly Bill</button>
+            <button class="btn action" id="openGenerateReportPopup">Generate Report</button>
+            <button class="btn action" id="rateTableBtn">Rate Table</button>
+            <button class="btn action" id="recordSaleBtn">Record Sale</button>
+            <button class="btn action" id="recordAdvanceBtn">Record Advance</button>
+            <button class="btn action" id="manageFarmersBtn">Manage Farmers</button>
+            <button class="btn action" id="themeToggleBtn">🌙</button>
+
+        </div>
+
+    </div>
+
+    <!-- 🕒 Shift Info Bar -->
+    <div id="shiftInfoBar" class="shift-info">
+        🕒 Current Shift: <span id="shiftLabel">Morning</span> |
+        Date: <span id="dateLabel">2025-11-12</span>
+    </div>
+
+    <div class="card">
+        <div class="controls">
+            <div class="row">
+                <label>Farmer Code:</label>
+                <input type="text" id="farmerCode" placeholder="Enter code">
+
+                <label>Category:</label>
+                <input type="text" id="category" placeholder="Category">
+
+                <label>Date:</label>
+                <input type="date" id="rec_date">
+
+                <label>Shift:</label>
+                <select id="shift">
+                    <option>Morning</option>
+                    <option selected>Evening</option>
+                </select>
+
+                <label>Rate (₹/L):</label>
+                <input type="number" id="rate" step="0.01">
+                <label>Litres:</label>
+                <input type="number" id="litres" step="0.01">
+
+                <label>Fat (%):</label>
+                <input type="number" id="fat" step="0.01">
+
+                <label>SNF:</label>
+                <input type="number" id="snf" step="0.01">
+
+                <label>Amount (₹):</label>
+                <input type="number" id="amount" step="0.01">
+            </div>
+
+            <div class="row buttons">
+                <button class="btn primary" id="calcBtn">Calculate</button>
+                <button class="btn save" id="saveBtn">Save Record</button>
+                <button class="btn missed" id="missedBtn">Missed Mil</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="summary">
+        <span id="farmersCount">Farmers: 0</span>
+        <span id="milkToday">Milk Today (Evening): 0.00 L (None)</span>
+        <span id="salesToday">Sales Today: 0.00 L (None)</span>
+        <span id="amountToday">Amount Today: ₹0.00</span>
+        <span id="totalRecords">Total Records: 0</span>
+    </div>
+
+    <div class="tabs">
+        <button class="tab active" data-tab="milk">Milk Records</button>
+        <button class="tab" data-tab="adv">Advances</button>
+        <button class="tab" data-tab="sales">Sales</button>
+        <label>Show Shift:</label>
+        <select id="showShift">
+            <option>Morning</option>
+            <option selected>Evening</option>
+        </select>
+        <label>Date:</label>
+        <input type="date" id="rec_date_milk">
+        <button id="showAllBtn" class="btn-small">📜 Show All</button>
+    </div>
+    
+    <div class="content">
+        <!-- 🥛 Milk Records -->
+        <div id="milk" class="tabcontent active">
+            <table id="recordsTable">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Date</th>
+                        <th>Farmer Code</th>
+                        <th>Farmer Name</th>
+                        <th>Category</th>
+                        <th>Shift</th>
+                        <th>Litres</th>
+                        <th>Fat</th>
+                        <th>Snf</th>
+                        <th>Rate</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    
+        <!-- 💰 Advances -->
+        <div id="adv" class="tabcontent">
+            <table id="advanceTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Farmer Code</th>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Remarks</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    
+        <!-- 🧾 Sales -->
+        <div id="sales" class="tabcontent">
+            <table id="salesTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Date</th>
+                        <th>Customer</th>
+                        <th>Litres</th>
+                        <th>Rate</th>
+                        <th>Amount</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+    
+            <div class="sales-summary">
+                <span id="salesTotalLitres">Total Litres: 0 L</span> |
+                <span id="salesTotalAmount">Total Sales: ₹0.00</span>
+            </div>
+        </div>
+    </div>
+
+
+    
+
+    <!-- 🧾 Farmer Management Popup -->
+    <div id="farmerPopup" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>👩‍🌾 Manage Farmers</h3>
+                <span class="close-btn" id="closeFarmerPopup">&times;</span>
+            </div>
+
+            <div class="modal-body">
+                <div class="farmer-form">
+                    <input type="text" id="f_code" placeholder="Farmer Code">
+                    <input type="text" id="f_name" placeholder="Farmer Name">
+                    <input type="text" id="f_category" placeholder="Category">
+                    <button id="addFarmerBtn" class="btn primary">Add</button>
+                </div>
+
+                <table id="farmerTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 💰 Record Advance Popup -->
+    <div id="advancePopup" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>💰 Record Advance</h3>
+                <span class="close-btn" id="closeAdvancePopup">&times;</span>
+            </div>
+
+            <div class="modal-body">
+                <div class="advance-form">
+                    <input type="text" id="adv_farmer_code" placeholder="Farmer Code">
+                    <input type="date" id="adv_date">
+                    <input type="number" id="adv_amount" placeholder="Amount (₹)">
+                    <input type="text" id="adv_remarks" placeholder="Remarks (optional)">
+                    <button id="addAdvanceBtn" class="btn primary">Save</button>
+                </div>
+
+                <table id="advancePopupTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Farmer Code</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Remarks</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 🧾 Rate Table Popup -->
+    <div id="ratePopup" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>💰 Rate Table</h3>
+                <span class="close-btn" id="closeRatePopup">&times;</span>
+            </div>
+
+            <div class="modal-body">
+                <div class="rate-form">
+                    <input type="text" id="r_category" placeholder="Category">
+                    <input type="number" id="r_base" step="0.1" placeholder="Base ₹">
+                    <input type="number" id="r_fat" step="0.1" placeholder="Fat ₹/unit">
+                    <input type="number" id="r_snf" step="0.1" placeholder="SNF ₹/unit">
+                    <button id="addRateBtn" class="btn primary">Save</button>
+                </div>
+
+                <table id="rateTable">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Base</th>
+                            <th>Fat ₹/u</th>
+                            <th>SNF ₹/u</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔐 Change Password Popup -->
+    <div id="passwordPopup" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🔐 Change Password</h3>
+                <span class="close-btn" id="closePasswordPopup">&times;</span>
+            </div>
+
+            <div class="modal-body">
+                <input type="password" id="oldPass" placeholder="Old Password">
+                <input type="password" id="newPass" placeholder="New Password">
+                <button id="changePassBtn" class="btn primary">Update</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 🧾 Record Sale Popup -->
+    <div id="salePopup" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🧾 Record Sale</h3>
+                <span class="close-btn" id="closeSalePopup">&times;</span>
+            </div>
+
+            <div class="modal-body">
+                <div class="sale-form">
+                    <input type="text" id="sale_customer" placeholder="Customer Name">
+                    <input type="date" id="sale_date">
+                    <input type="number" id="sale_litres" placeholder="Litres (L)">
+                    <input type="number" id="sale_rate" placeholder="Rate (₹/L)">
+                    <input type="number" id="sale_amount" placeholder="Amount (auto)" readonly>
+                    <button id="addSaleBtn" class="btn primary">Save</button>
+                </div>
+
+                <table id="salesPopupTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Date</th>
+                            <th>Customer</th>
+                            <th>Litres</th>
+                            <th>Rate</th>
+                            <th>Amount</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+
+                <!-- 🧾 Sales Summary -->
+                <div class="sales-summary">
+                    <span id="salesTotalLitres">Total Litres: 0 L</span> |
+                    <span id="salesTotalAmount">Total Sales: ₹0.00</span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- 📊 Reports Popup -->
+    <div id="reportsPopup" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📊 Reports Summary</h3>
+                <span class="close-btn" id="closeReportsPopup">&times;</span>
+            </div>
+
+            <div class="modal-body">
+                <div class="filter-bar">
+                    <label>From:</label>
+                    <input type="date" id="report_start">
+                    <label>To:</label>
+                    <input type="date" id="report_end">
+                    <button id="generateReportBtn" class="btn primary">Generate</button>
+                </div>
+
+                <div class="report-summary">
+                    <h4>Summary</h4>
+                    <table class="summary-table">
+                        <tr>
+                            <td>🥛 Milk Collected:</td>
+                            <td><span id="rMilkLitres">0.00 L</span></td>
+                            <td>₹<span id="rMilkAmount">0.00</span></td>
+                        </tr>
+                        <tr>
+                            <td>💵 Sales:</td>
+                            <td><span id="rSaleLitres">0.00 L</span></td>
+                            <td>₹<span id="rSaleAmount">0.00</span></td>
+                        </tr>
+                        <tr>
+                            <td>💰 Advances:</td>
+                            <td colspan="2">₹<span id="rAdvanceAmount">0.00</span></td>
+                        </tr>
+                        <tr class="total-row">
+                            <td>🧾 Net Income:</td>
+                            <td colspan="2">₹<span id="rNetIncome">0.00</span></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 🧾 Create Bill Popup -->
+    <div id="billPopup" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🧾 Create Farmer Bill</h3>
+                <span class="close-btn" id="closeBillPopup">&times;</span>
+            </div>
+
+            <div class="modal-body">
+                <div class="bill-options">
+                    <label><input type="radio" name="billType" value="weekly" checked> Weekly Bill</label>
+                    <label><input type="radio" name="billType" value="monthly"> Monthly Bill</label>
+                </div>
+
+                <div class="filter-bar">
+                    <label>From:</label>
+                    <input type="date" id="bill_start">
+                    <label>To:</label>
+                    <input type="date" id="bill_end">
+                    <button id="generateBillBtn" class="btn primary">Generate Bill</button>
+                </div>
+
+                <div class="bill-summary" id="billSummaryContainer">
+                    <p style="text-align:center;color:#777;">Select a period and click Generate Bill</p>
+                </div>
+
+                <!-- 📤 Export Buttons -->
+                <div id="billExportButtons" style="display:none; text-align:center; margin-top:10px;">
+                    <button id="exportCSVBtn" class="btn small">📄 Export CSV</button>
+                    <button id="exportPDFBtn" class="btn small">🖨 Export PDF</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- 📤 Generate Report Popup -->
+    <div id="generateReportPopup" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📤 Export Dairy Report</h3>
+                <span class="close-btn" id="closeGenerateReportPopup">&times;</span>
+            </div>
+
+            <div class="modal-body">
+                <div class="filter-bar">
+                    <label>From:</label>
+                    <input type="date" id="genReport_start">
+                    <label>To:</label>
+                    <input type="date" id="genReport_end">
+                    <button id="viewReportBtn" class="btn primary">View Summary</button>
+                </div>
+
+                <div class="report-display" id="generatedReportContainer">
+                    <p style="text-align:center;color:#777;">Select date range and click "View Summary".</p>
+                </div>
+
+                <!-- 📄 Export Buttons -->
+                <div id="reportExportButtons" style="display:none; text-align:center; margin-top:10px;">
+                    <button id="exportReportPDFBtn" class="btn small">🖨 Export PDF</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="dashboard.js"></script>
+</body>
+
+</html>

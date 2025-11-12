@@ -1,0 +1,1374 @@
+/* =============================
+   Varad Dairy Dashboard Styles
+   Refined & Polished Version
+============================= */
+
+:root {
+    --purple: #7b3fbf;
+    --accent: #d7b7f0;
+    --muted: #666;
+    --green: #3cb371;
+}
+
+/* Base Styles */
+* {
+    box-sizing: border-box;
+    font-family: Segoe UI, Roboto, Arial, sans-serif;
+}
+
+body {
+    margin: 0;
+    background: #fafafa;
+    color: #222;
+    border: 1px solid #e5dafb;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* =============================
+   NAVBAR / TOPBAR
+============================= */
+.topbar {
+    background: linear-gradient(90deg, var(--purple), #a566c9);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-bottom: 4px solid rgba(0, 0, 0, 0.06);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+}
+
+.brand img {
+    width: 26px;
+    height: 26px;
+    border-radius: 4px;
+    background: #fff;
+    padding: 2px;
+}
+
+.actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    padding: 6px 10px;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.actions .btn:hover {
+    background: #f3e5f5;
+    color: #4a148c;
+    border-color: #ba68c8;
+    box-shadow: 0 2px 6px rgba(123, 63, 191, 0.25);
+    transform: translateY(-1px);
+}
+
+/* =============================
+   CONTROLS
+============================= */
+/* =============================
+   ✨ FORM CONTROLS CLEAN GRID
+============================= */
+.controls {
+    padding: 18px 22px;
+    background: var(--card-bg, #fff);
+    border-bottom: 1px solid #ddd;
+    border-radius: 8px;
+    margin: 10px;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Use a 3-row grid layout */
+.controls .row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px 18px;
+    margin-bottom: 2px;
+    align-items: center;
+}
+
+/* Labels */
+.controls label {
+    font-size: 14px;
+    color: #333;
+    font-weight: 600;
+}
+
+/* Inputs & Selects */
+.controls input,
+.controls select {
+    width: 100%;
+    padding: 7px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    background: #fff;
+    color: #222;
+    transition: 0.25s ease;
+}
+
+.controls input:focus,
+.controls select:focus {
+    border-color: #8e5bd6;
+    box-shadow: 0 0 6px rgba(142, 91, 214, 0.25);
+    outline: none;
+}
+
+/* Buttons row (third row only) */
+.controls .row.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 6px;
+}
+
+.controls .btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.controls .btn.primary {
+    background: #8e5bd6;
+    color: #fff;
+}
+
+.controls .btn.save {
+    background: #4caf50;
+    color: #fff;
+}
+
+.controls .btn.missed {
+    background: #eee;
+    color: #333;
+}
+
+.controls .btn:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.1);
+}
+/* =============================
+   SUMMARY SECTION
+============================= */
+.summary {
+    padding: 10px 18px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    align-items: center;
+    font-weight: 600;
+    font-size: 15px;
+    color: #333;
+    background: linear-gradient(90deg, #f9f6ff, #fefbff);
+    border-bottom: 1px solid #eee;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* =============================
+   📋 TABS + SHOW SHIFT BAR
+============================= */
+.tabs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: #fff;
+    border-bottom: 1px solid #e6e6e6;
+    flex-wrap: wrap;
+}
+
+.tab {
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    background: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    color: #333;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s ease;
+}
+
+.tab:hover {
+    background: #f6f1ff;
+}
+
+.tab.active {
+    background: #e8dbff;
+    border-color: #7b3fbf;
+    color: #2a044e;
+    box-shadow: 0 2px 6px rgba(123, 63, 191, 0.2);
+}
+
+.tabs label {
+    margin-left: 15px;
+    font-size: 14px;
+    color: #444;
+    font-weight: 500;
+}
+
+.tabs select {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #fff;
+    color: #333;
+    font-size: 14px;
+    cursor: pointer;
+    min-width: 120px;
+    transition: 0.2s ease;
+    outline: none;
+}
+
+.tabs select:focus {
+    border-color: #8d5ed6;
+    box-shadow: 0 0 4px rgba(141, 94, 214, 0.4);
+}
+
+/* =============================
+   🕒 SHIFT INFO BAR (LIGHT MODE)
+============================= */
+.shift-info {
+    background: #f8f3fc;
+    color: #333;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 8px 20px;
+    text-align: center;
+    border-bottom: 1px solid #d0bde3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.shift-info span {
+    font-weight: bold;
+    color: #4B0082;
+}
+
+.shift-info.is-sticky {
+    background: #ede1f8;
+    transition: background 0.3s ease;
+}
+
+.shift-id {
+    color: var(--muted, #a58ee0);
+    font-size: 0.85em;
+    font-weight: 500;
+    margin-left: 4px;
+}
+/* =============================
+   TABLES
+============================= */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+/* ============================
+   🧾 Scrollable Tables & Layout
+============================ */
+/* =============================
+   🧾 Table + Content Area Refinement
+============================= */
+
+.content {
+    padding: 12px;
+    height: calc(100vh - 220px);
+    /* fits full screen minus header */
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Ensure tab content fills full width */
+.tabcontent {
+    width: 100%;
+    height: calc(100vh - 230px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0 10px;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.tabcontent.active {
+    display: block;
+    opacity: 1;
+}
+
+/* ✅ Table Full-Width Layout */
+.tabcontent table {
+    width: 100%;
+    max-width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    table-layout: fixed;
+    /* evenly spaced columns */
+    display: table;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* ✅ Sticky header (always visible on scroll) */
+.tabcontent table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: #faf7ff;
+    font-weight: 600;
+    text-align: left;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    color: #444;
+}
+
+/* ✅ Table Cells */
+tbody td {
+    padding: 10px;
+    border-bottom: 1px solid #f3f3f3;
+    color: #333;
+    word-wrap: break-word;
+}
+
+table tbody tr:hover {
+    background: #f9f5ff;
+    transition: background 0.2s ease;
+}
+
+/* ✅ Smooth scrollbars */
+.content::-webkit-scrollbar,
+.tabcontent::-webkit-scrollbar {
+    width: 8px;
+}
+
+.content::-webkit-scrollbar-thumb,
+.tabcontent::-webkit-scrollbar-thumb {
+    background-color: #b9a2e8;
+    border-radius: 10px;
+}
+
+body.dark .content::-webkit-scrollbar-thumb,
+body.dark .tabcontent::-webkit-scrollbar-thumb {
+    background-color: #6d4caf;
+}
+
+/* =============================
+   🌙 Dark Mode Table
+============================= */
+body.dark table {
+    background: #1e152b;
+    color: #f0e9ff;
+    border: 1px solid #3b3160;
+}
+
+body.dark thead th {
+    background: #2a1f42;
+    color: #e7dfff;
+    border-bottom: 1px solid #3b3160;
+}
+
+body.dark tbody td {
+    border-bottom: 1px solid #3b3160;
+}
+
+body.dark tbody tr:hover {
+    background: #2d2048;
+}
+
+/* =============================
+   Farmer Table Input Fields
+============================= */
+#farmerTable input[readonly] {
+    background: transparent;
+    border: none;
+    color: inherit;
+}
+
+#farmerTable input:not([readonly]) {
+    background: #fff8ff;
+    border: 1px solid #bba3ff;
+    border-radius: 4px;
+    padding: 4px;
+    color: #3a2a6b;
+}
+
+body.dark #farmerTable input:not([readonly]) {
+    background: #2d1f44;
+    border: 1px solid #9a76ff;
+    color: #e7d9ff;
+}
+
+/* =============================
+   CARD STYLING
+============================= */
+.card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+    padding: 12px 16px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    /* transform: translateY(-3px); */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* =============================
+   MODALS
+============================= */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+/* When modal open */
+.modal.active {
+    display: block;
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 4% auto;
+    padding: 24px;
+    border-radius: 12px;
+    width: 70%;
+    max-width: 900px;
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.25);
+    animation: popupFade 0.25s ease;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+.close-btn {
+    cursor: pointer;
+    font-size: 24px;
+    color: #888;
+}
+
+.close-btn:hover {
+    color: red;
+}
+
+/* =============================
+   SHIFT INFO BAR
+============================= */
+.shift-info {
+    position: sticky;
+    top: 48px;
+    z-index: 998;
+    background: linear-gradient(90deg, #f6f0fc, #ede1f8);
+    color: #333;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 8px 20px;
+    border-bottom: 1px solid #d0bde3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+}
+
+.shift-info span {
+    font-weight: bold;
+    color: #4B0082;
+}
+
+.shift-info.flash {
+    animation: flashShift 0.6s ease-in-out;
+}
+
+@keyframes flashShift {
+    0% {
+        background-color: #d1c4e9;
+    }
+
+    100% {
+        background-color: #f9f9ff;
+    }
+}
+
+/* =============================
+   SCROLLBAR (Desktop App Feel)
+============================= */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c2a5f3;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a57ce8;
+}
+
+/* =============================
+   OTHER ELEMENTS
+============================= */
+.advance-form input {
+    margin: 4px;
+    padding: 6px;
+}
+
+.sales-summary {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: #f8f3fc;
+    border-top: 1px solid #ddd;
+    text-align: center;
+    font-weight: 500;
+    color: #4B0082;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.sales-summary span {
+    font-weight: bold;
+}
+
+/* Report + Bill Tables */
+.filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.summary-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.summary-table td {
+    padding: 6px 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.summary-table .total-row td {
+    font-weight: bold;
+    background: #f3e9ff;
+    color: #4B0082;
+    border-top: 2px solid #4B0082;
+}
+
+/* Bill and Report */
+.bill-options {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.bill-summary table,
+.report-display table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.bill-summary th,
+.bill-summary td,
+.report-display th,
+.report-display td {
+    padding: 8px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+.bill-summary th,
+.report-display th {
+    background: #f3e9ff;
+    color: #4B0082;
+    font-weight: bold;
+}
+
+/* Export Buttons */
+.btn.small {
+    padding: 6px 12px;
+    font-size: 14px;
+    margin: 5px;
+    background: #e9ddf9;
+    border: 1px solid #c8a9ff;
+    color: #4B0082;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn.small:hover {
+    background: #dcd0f8;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .controls .row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .actions {
+        overflow: auto;
+    }
+}
+
+/* =============================
+   🌙 FINAL DARK MODE (preserve original + fixes)
+   Use this block to replace your current dark-mode section
+============================= */
+body.dark {
+    --purple: #c49bff;
+    --accent: #452a67;
+    --muted: #b8a8d1;
+    background: #1b1528;
+    color: #f0e9ff;
+    border-color: #3a2b5f;
+    transition: background 0.35s ease, color 0.35s ease;
+}
+
+/* Top Bar (preserve original look) */
+body.dark .topbar {
+    background: linear-gradient(90deg, #3a2160, #5a3192);
+    color: #fff;
+    box-shadow: 0 3px 8px rgba(90, 50, 150, 0.4);
+}
+
+/* Buttons in topbar */
+body.dark .actions .btn {
+    background: #2a1f3e;
+    color: #f8f3ff;
+    border: 1px solid #4a3c67;
+    transition: 0.2s ease;
+}
+
+body.dark .actions .btn:hover {
+    background: #3b2a5c;
+    color: #fff;
+    border-color: #8355ff;
+    box-shadow: 0 0 10px rgba(155, 100, 255, 0.3);
+}
+
+/* Panels and cards (original) */
+body.dark .controls,
+body.dark .summary,
+body.dark table,
+body.dark .card,
+body.dark .modal-content {
+    background: #251b36;
+    color: #eee;
+    border-color: #3b3160;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+/* Table text colors (original) */
+body.dark th,
+body.dark td {
+    border-color: #3b3160;
+    color: #e6dfff;
+}
+
+body.dark table tbody tr:hover {
+    background: #32224f;
+}
+
+/* Tabs + improved dropdown alignment + visuals */
+body.dark .tabs {
+    background: #1e162d;
+    border-bottom: 1px solid #3b3160;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    flex-wrap: wrap;
+}
+
+/* tab button baseline */
+body.dark .tab {
+    background: #2b2242;
+    border: 1px solid #4a3c67;
+    color: #ddd;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-weight: 600;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+/* active tab stronger */
+body.dark .tab.active {
+    background: #5a4293;
+    border-color: #b792ff;
+    color: #fff;
+    box-shadow: 0 3px 8px rgba(151, 110, 255, 0.12);
+}
+
+/* labels in tabs area (like "Show Shift:") */
+body.dark .tabs label {
+    color: #d6c8ff;
+    font-weight: 600;
+    margin-left: 8px;
+}
+
+/* select (dropdown) styling to match tabs */
+body.dark .tabs select {
+    background: #2a203f;
+    border: 1px solid #5a4c78;
+    color: #eee;
+    border-radius: 6px;
+    padding: 7px 10px;
+    min-width: 140px;
+    outline: none;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+body.dark .tabs select:focus {
+    border-color: #a987ff;
+    box-shadow: 0 0 6px rgba(169, 135, 255, 0.28);
+}
+
+/* =============================
+   FORM CONTROLS: bright labels + grid layout + inputs
+   (fixes label brightness + alignment + buttons row)
+============================= */
+
+/* container look */
+body.dark .controls {
+    background: #1f1630;
+    /* keep original tone */
+    border-bottom: 1px solid #3b2f5b;
+    padding: 18px 20px;
+    border-radius: 6px;
+}
+
+/* brighter form labels */
+body.dark .controls label {
+    color: #f0e9ff;
+    /* brighter */
+    font-weight: 600;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* grid layout: 2 rows for fields, buttons in separate row */
+body.dark .controls .row {
+    display: grid;
+    /* adjust columns for even spacing; min of 160px, flexible */
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px 18px;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+/* inputs and selects */
+body.dark .controls input,
+body.dark .controls select {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    background: #2a2040;
+    color: #f9f6ff;
+    border: 1px solid #5e4b80;
+    transition: box-shadow 0.22s ease, border-color 0.22s ease, background 0.22s ease;
+}
+
+/* keep amount slightly highlighted but not too bright */
+body.dark .controls input.amount-highlight {
+    background: #2d2146;
+    /* subtle difference retained */
+}
+
+/* focus glow for inputs */
+body.dark .controls input:focus,
+body.dark .controls select:focus {
+    border-color: #b592ff;
+    box-shadow: 0 0 8px rgba(181, 140, 255, 0.24);
+    background: #342755;
+    outline: none;
+}
+
+/* Buttons: put in own row and center them */
+body.dark .controls .row.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    margin-top: 6px;
+}
+
+/* preserve original button colors but tightened style */
+body.dark .controls .btn {
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-weight: 600;
+    border: 1px solid transparent;
+    cursor: pointer;
+}
+
+body.dark .controls .btn.primary {
+    background: #9e6cff;
+    color: #fff;
+    border-color: rgba(158, 108, 255, 0.06);
+}
+
+body.dark .controls .btn.save {
+    background: #44c45d;
+    color: #fff;
+}
+
+body.dark .controls .btn.missed {
+    background: #3b2f4f;
+    color: #f5eaff;
+    border: 1px solid #5d4b75;
+}
+
+/* smaller button hover */
+body.dark .controls .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
+}
+
+/* keep numeric inputs visually consistent */
+body.dark .controls input[type="number"],
+body.dark .controls input[type="text"],
+body.dark .controls input[type="date"] {
+    background: #2d2146;
+}
+
+/* =============================
+   SHIFT INFO BAR (contrast + vibrancy)
+============================= */
+body.dark .shift-info {
+    background: linear-gradient(90deg, #241a38, #2e2049);
+    color: #e8dbff;
+    border-bottom: 1px solid #47396a;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.33);
+    font-weight: 600;
+    padding: 8px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+body.dark .shift-info span {
+    color: #cba8ff;
+    font-weight: 700;
+}
+
+/* subtle flash animation for shift change */
+body.dark .shift-info.flash {
+    animation: flashShiftDark 0.6s ease-in-out;
+}
+
+@keyframes flashShiftDark {
+    0% {
+        background-color: #3a2763;
+    }
+
+    100% {
+        background-color: #241a38;
+    }
+}
+
+/* =============================
+   Tweak for other components to keep contrast consistent
+============================= */
+body.dark .summary {
+    background: #1f1630;
+    border-top: 1px solid #3b2f5b;
+    color: #e8dbff;
+}
+
+body.dark .card {
+    background: #1e152b;
+    border: 1px solid #332547;
+}
+
+body.dark .modal-content {
+    background: #21162f;
+    border: 1px solid #3b2f5b;
+}
+
+/* smooth transitions (keep original behavior) */
+body,
+.modal-content,
+.card,
+.summary,
+.controls,
+.topbar,
+table,
+.shift-info {
+    transition: background 0.35s ease, color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+}
+
+/* =============================
+   🌙 DARK MODE POPUPS POLISH
+============================= */
+
+/* General modal layout improvements */
+body.dark .modal-content {
+    background: #1d152b;
+    color: #f2eaff;
+    border: 1px solid #3b2f5b;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+    padding: 18px 24px;
+}
+
+/* Headings */
+body.dark .modal-header h3 {
+    color: #f4e9ff;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+}
+
+/* Close Button */
+body.dark .close-btn {
+    color: #bda3ff;
+    font-size: 22px;
+    transition: color 0.2s ease;
+}
+
+body.dark .close-btn:hover {
+    color: #ff7575;
+}
+
+/* Horizontal Divider under header */
+body.dark .modal-header {
+    border-bottom: 1px solid #5a4493;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+}
+
+/* Input Fields inside Popups */
+body.dark .modal-body input,
+body.dark .modal-body select {
+    background: #2a203f;
+    border: 1px solid #5c4c7a;
+    color: #f5ebff;
+    padding: 7px 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+body.dark .modal-body input:focus,
+body.dark .modal-body select:focus {
+    border-color: #b592ff;
+    box-shadow: 0 0 6px rgba(182, 146, 255, 0.35);
+    background: #35265a;
+    outline: none;
+}
+
+/* Button Fix inside Popups */
+body.dark .modal-body .btn {
+    background: #422e73;
+    color: #fff;
+    border: 1px solid #6c52a8;
+    border-radius: 6px;
+    padding: 7px 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+body.dark .modal-body .btn:hover {
+    background: #5d3e9b;
+    box-shadow: 0 0 10px rgba(146, 100, 255, 0.4);
+}
+
+/* Smaller utility buttons like Save / Export */
+body.dark .modal-body .btn.small,
+body.dark #exportPDFBtn,
+body.dark #exportCSVBtn {
+    background: #5a3e9c;
+    border: 1px solid #8567d1;
+    color: #fff;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 6px;
+}
+
+body.dark .modal-body .btn.small:hover {
+    background: #7b59c9;
+}
+
+/* =============================
+   Tables inside Popups
+============================= */
+body.dark table {
+    background: #221838;
+    color: #f4eaff;
+    border-collapse: collapse;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+body.dark thead th {
+    background: #2f2152;
+    color: #d9caff;
+    font-weight: 600;
+    border-bottom: 1px solid #4c3a73;
+    padding: 10px 12px;
+}
+
+body.dark tbody td {
+    border-bottom: 1px solid #3a2b5f;
+    padding: 8px 12px;
+    color: #efe5ff;
+}
+
+body.dark tbody tr:hover {
+    background: #342557;
+}
+
+/* Data alignment fix */
+body.dark table td,
+body.dark table th {
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* =============================
+   Special Sections
+============================= */
+body.dark .sales-summary,
+body.dark .bill-summary,
+body.dark .report-display {
+    background: #261b3f;
+    border: 1px solid #4a3b70;
+    border-radius: 8px;
+    color: #f4eaff;
+    padding: 10px 14px;
+}
+
+/* Totals Row Highlight */
+body.dark .summary-table .total-row td,
+body.dark .bill-summary tr:last-child td {
+    background: #4a327f;
+    color: #fff;
+    font-weight: 700;
+    border-top: 2px solid #9f7eff;
+}
+
+/* Icons and emoji in titles slightly brightened */
+body.dark .modal-header h3::first-letter {
+    color: #d5b3ff;
+}
+
+/* Align date range + button */
+body.dark .filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+body.dark .filter-bar label {
+    color: #f0e9ff;
+    font-weight: 600;
+}
+
+/* =============================
+   Farmer / Sales / Rate Table Forms
+============================= */
+body.dark .farmer-form,
+body.dark .sale-form,
+body.dark .advance-form,
+body.dark .rate-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+body.dark .farmer-form input,
+body.dark .sale-form input,
+body.dark .advance-form input,
+body.dark .rate-form input {
+    flex: 1;
+    min-width: 150px;
+}
+
+/* Action buttons inside tables */
+body.dark table button {
+    background: #4a327f;
+    border: none;
+    color: #fff;
+    border-radius: 5px;
+    padding: 4px 7px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+body.dark table button:hover {
+    background: #704bc4;
+    box-shadow: 0 0 6px rgba(138, 90, 255, 0.4);
+}
+
+/* ============================
+   👩‍🌾 Manage Farmers Popup Scroll Fix
+============================ */
+#farmerPopup .modal-content {
+    max-height: 85vh;
+    /* popup never grows beyond screen */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+#farmerPopup .modal-body {
+    flex: 1;
+    overflow-y: auto;
+    /* scroll inside */
+    margin-top: 10px;
+    padding-right: 5px;
+}
+
+/* Farmer Table Scroll + Style */
+#farmerTable {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px;
+    background: #fff;
+}
+
+#farmerTable thead th {
+    position: sticky;
+    top: 0;
+    background: #f8f3fc;
+    z-index: 5;
+}
+
+/* Scrollbar styling */
+#farmerPopup .modal-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+#farmerPopup .modal-body::-webkit-scrollbar-thumb {
+    background: #c7a9f7;
+    border-radius: 10px;
+}
+
+body.dark #farmerPopup .modal-body::-webkit-scrollbar-thumb {
+    background: #7b5cb3;
+}
+
+/* Dark mode table inside popup */
+body.dark #farmerPopup .modal-content {
+    background: #2a1f3e;
+    color: #f3e9ff;
+    border: 1px solid #4a3c67;
+}
+
+body.dark #farmerTable {
+    background: #261b3b;
+}
+
+body.dark #farmerTable thead th {
+    background: #3a2b5f;
+    color: #e8dfff;
+}
+
+body.dark #farmerTable td input {
+    background: #32244f;
+    border: 1px solid #59427c;
+    color: #f0e9ff;
+    border-radius: 4px;
+    padding: 4px 6px;
+}
+
+/* =============================
+   📅 Date + Show All Section
+   IDs: #rec_date_milk + #showAllBtn
+============================= */
+
+/* 📆 Date Input */
+#rec_date_milk {
+    padding: 5px 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 13.5px;
+    color: #222;
+    background: #fff;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+#rec_date_milk:focus {
+    border-color: #8a5ee0;
+    box-shadow: 0 0 4px rgba(138, 94, 224, 0.25);
+}
+
+/* 📜 Show All Button */
+#showAllBtn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    background: #f4e7ff;
+    border: 1px solid #b48cff;
+    color: #4b0082;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 13.5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#showAllBtn:hover {
+    background: #e8d4ff;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(123, 63, 191, 0.25);
+}
+
+body.dark #rec_date_milk {
+    background: #2a203f;
+    color: #eee;
+    border: 1px solid #5a4c78;
+}
+
+body.dark #rec_date_milk:focus {
+    border-color: #a987ff;
+    box-shadow: 0 0 6px rgba(169, 135, 255, 0.28);
+}
+
+body.dark #showAllBtn {
+    background: #3a2960;
+    border: 1px solid #7852c8;
+    color: #f5eaff;
+}
+
+body.dark #showAllBtn:hover {
+    background: #4b3585;
+    box-shadow: 0 2px 6px rgba(150, 100, 255, 0.3);
+}
+
+/* =============================
+   💰 Advance Popup Scroll Fix
+============================= */
+
+#advancePopup .modal-content {
+    max-height: 85vh;
+    /* Prevent popup from overflowing screen */
+    overflow: hidden;
+    /* Keep content neatly clipped */
+    display: flex;
+    flex-direction: column;
+}
+
+#advancePopup .modal-body {
+    flex: 1;
+    overflow-y: auto;
+    /* ✅ Enable scroll inside modal */
+    margin-top: 10px;
+    padding-right: 6px;
+}
+
+/* Table inside popup */
+#advancePopup table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+}
+
+#advancePopup thead th {
+    position: sticky;
+    top: 0;
+    background: #f8f3fc;
+    z-index: 5;
+}
+
+/* 🌙 Dark mode adjustments */
+body.dark #advancePopup .modal-content {
+    background: #2a1f3e;
+    color: #f3e9ff;
+    border: 1px solid #4a3c67;
+}
+
+body.dark #advancePopup thead th {
+    background: #3b2b5f;
+    color: #ffffff;
+    /* Pure white headers */
+    font-weight: 600;
+    border-bottom: 1px solid #4a3c67;
+}
+
+body.dark #advancePopup .modal-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+body.dark #advancePopup .modal-body::-webkit-scrollbar-thumb {
+    background: #7b5cb3;
+    border-radius: 10px;
+}
+
+/* =============================
+   💰 Dark Mode Fix — Advance Popup Table Contrast
+============================= */
+
+body.dark #advancePopup table {
+    background: #261b3b;
+    color: #f2e9ff;
+    /* Brighter text */
+    border-collapse: collapse;
+}
+
+body.dark #advancePopup tbody td {
+    color: #f2e9ff;
+    /* readable body text */
+    border-bottom: 1px solid #3b3160;
+}
+
+body.dark #advancePopup tbody tr:hover {
+    background: #37285b;
+}
+
+#salePopup .modal-content {
+    max-height: 80vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
