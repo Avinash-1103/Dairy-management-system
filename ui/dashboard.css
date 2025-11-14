@@ -1372,3 +1372,24 @@ body.dark #advancePopup tbody tr:hover {
     overflow-y: auto;
     overflow-x: hidden;
 }
+
+input.invalid {
+    border: 2px solid #ff3b3b !important;
+    background: #ffecec !important;
+}
+
+#saveBtn:disabled {
+    background: #bfbfbf !important;
+    cursor: not-allowed !important;
+    opacity: 0.6;
+}
+
+.error {
+    border: 2px solid red !important;
+    background: #ffe5e5 !important;
+}
+
+#billSummaryContainer {
+    max-height: 400px;
+    overflow-y: auto;
+}

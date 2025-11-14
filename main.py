@@ -15,37 +15,39 @@ import shutil
 #  DATABASE HANDLER — ensures correct DB copy for packaged .exe
 # ================================================================
 
-APP_NAME = "Varad_Dairy"
+# APP_NAME = "Varad_Dairy"
 
-#  Folder for user data (this is where real DB will live)
-user_data_dir = os.path.join(os.path.expanduser("~"), "Documents", APP_NAME)
-os.makedirs(user_data_dir, exist_ok=True)
+# #  Folder for user data (this is where real DB will live)
+# user_data_dir = os.path.join(os.path.expanduser("~"), "Documents", APP_NAME)
+# os.makedirs(user_data_dir, exist_ok=True)
 
-#  Actual working database path
-DB = os.path.join(user_data_dir, "database.db")
+# #  Actual working database path
+# DB = os.path.join(user_data_dir, "database.db")
 
-#  Determine where the bundled database.db is located
-if getattr(sys, "frozen", False):
-    # Running from .exe — PyInstaller unpacks here
-    base_path = sys._MEIPASS
-else:
-    # Running directly from source
-    base_path = os.path.dirname(os.path.abspath(__file__))
+# #  Determine where the bundled database.db is located
+# if getattr(sys, "frozen", False):
+#     # Running from .exe — PyInstaller unpacks here
+#     base_path = sys._MEIPASS
+# else:
+#     # Running directly from source
+#     base_path = os.path.dirname(os.path.abspath(__file__))
 
-#  Path to default database (the one inside your source or packaged folder)
-src_db = os.path.join(base_path, "database.db")
+# #  Path to default database (the one inside your source or packaged folder)
+# src_db = os.path.join(base_path, "database.db")
 
-#  Copy starter DB only if missing
-if not os.path.exists(DB):
-    try:
-        if os.path.exists(src_db):
-            print(f"Copying starter database to {DB}")
-            shutil.copy(src_db, DB)
-        else:
-            print("Starter database not found. Creating blank one...")
-            open(DB, "w").close()
-    except Exception as e:
-        print(" Error copying database:", e)
+# #  Copy starter DB only if missing
+# if not os.path.exists(DB):
+#     try:
+#         if os.path.exists(src_db):
+#             print(f"Copying starter database to {DB}")
+#             shutil.copy(src_db, DB)
+#         else:
+#             print("Starter database not found. Creating blank one...")
+#             open(DB, "w").close()
+#     except Exception as e:
+#         print(" Error copying database:", e)
+
+DB = "database.db"
 
 # Threading lock for SQLite
 lock = threading.Lock()
@@ -186,6 +188,237 @@ class Api:
             return json.dumps({"success": False, "message": str(e)})
 
     # -------------------------------
+    # 📄 GENERATE DAILY / RANGE REPORT
+    # -------------------------------
+    def generate_report(self, data):
+        try:
+            payload = json.loads(data)
+            from_date = payload.get("from_date")
+            to_date = payload.get("to_date")
+            shift = payload.get("shift")
+
+            conn = sqlite3.connect(DB)
+            c = conn.cursor()
+
+            sql = """
+                SELECT 
+                    rec_date,
+                    farmer_code,
+                    farmer_name,
+                    category,
+                    shift,
+                    litres,
+                    fat,
+                    snf,
+                    rate,
+                    amount
+                FROM milk_records
+                WHERE rec_date BETWEEN ? AND ?
+            """
+            params = [from_date, to_date]
+
+            if shift and shift.lower() != "all":
+                sql += " AND LOWER(shift) = LOWER(?)"
+                params.append(shift)
+
+            sql += " ORDER BY rec_date ASC, id ASC"
+
+            c.execute(sql, params)
+            rows = query_dicts(c)
+
+            conn.close()
+            return json.dumps({"success": True, "records": rows})
+
+        except Exception as e:
+            print("generate_report error:", e)
+            return json.dumps({"success": False, "message": "Backend error"})
+
+
+    def get_individual_bill(self, data):
+        try:
+            payload = json.loads(data)
+            code = payload.get("code")
+            start_date = payload.get("start_date")
+            end_date = payload.get("end_date")
+
+            conn = sqlite3.connect(DB)
+            c = conn.cursor()
+
+            c.execute("""
+                SELECT rec_date, shift, litres, fat, snf, rate, amount
+                FROM milk_records
+                WHERE farmer_code=? AND rec_date BETWEEN ? AND ?
+                ORDER BY rec_date ASC
+            """, (code, start_date, end_date))
+            records = query_dicts(c)
+
+            c.execute("SELECT IFNULL(SUM(litres),0), IFNULL(SUM(amount),0) FROM milk_records WHERE farmer_code=? AND rec_date BETWEEN ? AND ?", (code, start_date, end_date))
+            total_litres, total_amount = c.fetchone()
+
+            c.execute("SELECT IFNULL(SUM(amount),0) FROM farmer_advances WHERE farmer_code=? AND date BETWEEN ? AND ?", (code, start_date, end_date))
+            total_advance = c.fetchone()[0]
+
+            conn.close()
+
+            return json.dumps({
+                "success": True,
+                "data": {
+                    "records": records,
+                    "total_litres": total_litres,
+                    "total_amount": total_amount,
+                    "total_advance": total_advance,
+                    "net": total_amount - total_advance
+                }
+            })
+
+        except Exception as e:
+            print("get_individual_bill error:", e)
+            return json.dumps({"success": False, "message": str(e)})
+
+
+
+    # -------------------------------
+    # 📊 REPORT SUMMARY (Milk + Sales + Advances)
+    # -------------------------------
+    def get_reports_summary(self, data):
+        """Get overall summary for given date range"""
+        try:
+            payload = json.loads(data or "{}")
+            start_date = payload.get("start_date")
+            end_date = payload.get("end_date")
+
+            with lock:
+                conn = sqlite3.connect(DB, timeout=10, check_same_thread=False)
+                c = conn.cursor()
+
+                # 🥛 Milk Summary
+                c.execute("""
+                    SELECT IFNULL(SUM(litres),0), IFNULL(SUM(amount),0)
+                    FROM milk_records
+                    WHERE rec_date BETWEEN ? AND ?
+                """, (start_date, end_date))
+                milk_litres, milk_amount = c.fetchone()
+
+                # 💵 Sales Summary
+                c.execute("""
+                    SELECT IFNULL(SUM(litres),0), IFNULL(SUM(amount),0)
+                    FROM sales_records
+                    WHERE sale_date BETWEEN ? AND ?
+                """, (start_date, end_date))
+                sale_litres, sale_amount = c.fetchone()
+
+                # 💰 Advances
+                c.execute("""
+                    SELECT IFNULL(SUM(amount),0)
+                    FROM farmer_advances
+                    WHERE date BETWEEN ? AND ?
+                """, (start_date, end_date))
+                total_advances = c.fetchone()[0]
+
+                conn.close()
+
+            net_income = (milk_amount + sale_amount) - total_advances
+
+            return json.dumps({
+                "success": True,
+                "milk_litres": milk_litres,
+                "milk_amount": milk_amount,
+                "sale_litres": sale_litres,
+                "sale_amount": sale_amount,
+                "total_advances": total_advances,
+                "net_income": net_income,
+            })
+
+        except Exception as e:
+            print("❌ get_reports_summary error:", e)
+            return json.dumps({"success": False, "message": str(e)})
+
+    # -------------------------------
+    # 💰 GENERATE WEEKLY / MONTHLY BILL
+    # -------------------------------
+    def generate_bill(self, data):
+        try:
+            payload = json.loads(data)
+            start_date = payload.get("start_date")
+            end_date = payload.get("end_date")
+            bill_type = payload.get("bill_type")  # weekly or monthly
+
+            conn = sqlite3.connect(DB)
+            c = conn.cursor()
+
+            c.execute("SELECT code, name, category FROM farmers ORDER BY id ASC")
+            farmers = c.fetchall()
+
+            bills = []
+
+            for code, name, category in farmers:
+
+                # Milk summary
+                c.execute(
+                    """
+                    SELECT IFNULL(SUM(litres),0), IFNULL(SUM(amount),0)
+                    FROM milk_records
+                    WHERE farmer_code=? AND rec_date BETWEEN ? AND ?
+                """,
+                    (code, start_date, end_date),
+                )
+                litres, amount = c.fetchone()
+
+                # Advances
+                c.execute(
+                    """
+                    SELECT IFNULL(SUM(amount),0)
+                    FROM farmer_advances
+                    WHERE farmer_code=? AND date BETWEEN ? AND ?
+                """,
+                    (code, start_date, end_date),
+                )
+                advance = c.fetchone()[0]
+
+                net = amount - advance
+
+                bills.append(
+                    {
+                        "code": code,
+                        "name": name,
+                        "category": category,
+                        "litres": litres,
+                        "amount": amount,
+                        "advance": advance,
+                        "net": net,
+                    }
+                )
+
+            conn.close()
+
+            return json.dumps({"success": True, "bills": bills, "bill_type": bill_type})
+
+        except Exception as e:
+            print("generate_bill error:", e)
+            return json.dumps({"success": False, "message": "Backend error"})
+
+    # ===============================
+    # 📄 EXPORT REPORT AS PDF (Base64 HTML)
+    # ===============================
+    def export_report_pdf(self, data):
+        """
+        Accepts raw HTML content + returns it so frontend can trigger print window.
+        Mainly used as a bridge for consistent architecture.
+        """
+        try:
+            payload = json.loads(data or "{}")
+            html_content = payload.get("content")
+
+            if not html_content:
+                return json.dumps({"success": False, "message": "No content provided"})
+
+            return json.dumps({"success": True, "html": html_content})
+
+        except Exception as e:
+            print("export_report_pdf error:", e)
+            return json.dumps({"success": False, "message": str(e)})
+
+    # -------------------------------
     # 🧾 SAVE NEW MILK RECORD
     # -------------------------------
     def save_record(self, data):
@@ -195,10 +428,25 @@ class Api:
             farmer_code = payload.get("farmer_code")
             shift = payload.get("shift")
             litres = payload.get("litres")
-            fat = payload.get("fat")
-            snf = payload.get("snf")
+            fat = float(payload.get("fat") or 0)
+            snf = float(payload.get("snf") or 0)
             rate = payload.get("rate")
             amount = payload.get("amount")
+
+            # --------------------------
+            # 🧪 VALIDATION
+            # --------------------------
+            if not (2.0 <= fat <= 8.0):
+                return json.dumps({
+                    "success": False,
+                    "message": "Invalid FAT value! FAT must be between 2.0 and 8.0"
+                })
+
+            if not (7.0 <= snf <= 9.5):
+                return json.dumps({
+                    "success": False,
+                    "message": "Invalid SNF value! SNF must be between 7.0 and 9.5"
+                })
 
             conn = sqlite3.connect(DB)
             c = conn.cursor()
@@ -230,6 +478,7 @@ class Api:
                     amount,
                 ),
             )
+
             conn.commit()
             conn.close()
 
@@ -382,7 +631,6 @@ class Api:
         except Exception as e:
             print(" save_file error:", e)
             return json.dumps({"success": False, "message": str(e)})
-
 
     def get_rates(self, data=None):
         """

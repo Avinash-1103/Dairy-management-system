@@ -26,8 +26,67 @@ document.addEventListener("DOMContentLoaded", () => {
         bindGenerateReportPopup();
         bindThemeToggle();
         bindShowAllButton();
+        enableReportExportButtons();
+
     })();
+
+    document.getElementById("fat").addEventListener("input", validateFatSnf);
+    document.getElementById("snf").addEventListener("input", validateFatSnf);
+
+    document.getElementById("litres").addEventListener("keydown", blockNegative);
+    document.getElementById("litres").addEventListener("input", validateAllInputs);
+
+    document.getElementById("fat").addEventListener("keydown", blockNegative);
+    document.getElementById("fat").addEventListener("input", validateAllInputs);
+
+    document.getElementById("snf").addEventListener("keydown", blockNegative);
+    document.getElementById("snf").addEventListener("input", validateAllInputs);
+
+
 });
+
+
+function blockNegative(e) {
+    if (e.key === "-" || e.key === "+") {
+        e.preventDefault();
+    }
+}
+
+function validateAllInputs() {
+    const litres = parseFloat(document.getElementById("litres").value) || 0;
+    const fat = parseFloat(document.getElementById("fat").value) || 0;
+    const snf = parseFloat(document.getElementById("snf").value) || 0;
+    const saveBtn = document.getElementById("saveBtn");
+
+    let valid = true;
+
+    // Litres validation
+    if (litres <= 0) {
+        document.getElementById("litres").classList.add("error");
+        valid = false;
+    } else {
+        document.getElementById("litres").classList.remove("error");
+    }
+
+    // Fat validation
+    if (fat < 2 || fat > 10) {
+        document.getElementById("fat").classList.add("error");
+        valid = false;
+    } else {
+        document.getElementById("fat").classList.remove("error");
+    }
+
+    // SNF validation
+    if (snf < 6 || snf > 10) {
+        document.getElementById("snf").classList.add("error");
+        valid = false;
+    } else {
+        document.getElementById("snf").classList.remove("error");
+    }
+
+    saveBtn.disabled = !valid;
+    saveBtn.style.opacity = valid ? "1" : "0.4";
+}
 
 
 // 🌓 Theme Toggle
@@ -393,7 +452,61 @@ function calculateAmount() {
     document.getElementById("amount").value = amount.toFixed(2);
 }
 
+function validateMilkInputs() {
+    const fat = parseFloat(document.getElementById("fat").value);
+    const snf = parseFloat(document.getElementById("snf").value);
+
+    if (isNaN(fat) || isNaN(snf)) {
+        alert("⚠️ Please enter valid numeric values for Fat & SNF.");
+        return false;
+    }
+    if (fat < 2.0 || fat > 8.0) {
+        alert("⚠️ Fat must be between 2.0 and 8.0");
+        return false;
+    }
+    if (snf < 7.0 || snf > 9.5) {
+        alert("⚠️ SNF must be between 7.0 and 9.5");
+        return false;
+    }
+    return true;
+}
+
+function validateFatSnf() {
+    const fatInput = document.getElementById("fat");
+    const snfInput = document.getElementById("snf");
+    const saveBtn = document.getElementById("saveBtn");
+
+    const fat = parseFloat(fatInput.value);
+    const snf = parseFloat(snfInput.value);
+
+    let valid = true;
+
+    // FAT validation (2.0 - 8.0)
+    if (isNaN(fat) || fat < 2.0 || fat > 8.0) {
+        fatInput.classList.add("invalid");
+        valid = false;
+    } else {
+        fatInput.classList.remove("invalid");
+    }
+
+    // SNF validation (7.0 - 9.5)
+    if (isNaN(snf) || snf < 7.0 || snf > 9.5) {
+        snfInput.classList.add("invalid");
+        valid = false;
+    } else {
+        snfInput.classList.remove("invalid");
+    }
+
+    // Enable/Disable Save button
+    saveBtn.disabled = !valid;
+}
+
+
+
 async function saveRecord() {
+
+    if (!validateMilkInputs()) return;
+
     const payload = {
         rec_date: document.getElementById("rec_date").value,
         farmer_code: document.getElementById("farmerCode").value.trim(),
@@ -1010,6 +1123,14 @@ function bindBillPopup() {
         if (e.target === popup) popup.style.display = "none";
     });
 
+    document.getElementById("farmerSearchInput").addEventListener("input", (e) => {
+        const term = e.target.value.toLowerCase();
+        document.querySelectorAll("#billTable tbody tr").forEach(row => {
+            row.style.display = row.innerText.toLowerCase().includes(term) ? "" : "none";
+        });
+    });
+
+
     // 🧾 Generate Bill
     generateBtn.addEventListener("click", async () => {
         const start_date = document.getElementById("bill_start").value;
@@ -1025,59 +1146,8 @@ function bindBillPopup() {
                 `<p style='text-align:center;color:#777;'>No records found for selected period.</p>`;
         }
     });
-
-    // 📤 EXPORT FUNCTIONS
-    document.getElementById("exportCSVBtn").addEventListener("click", () => {
-        if (!window.generatedBills || window.generatedBills.length === 0) {
-            alert("No bills to export!");
-            return;
-        }
-
-        let csv = "Farmer Code,Name,Category,Total Litres,Amount,Advance,Net Payable\n";
-        window.generatedBills.forEach(b => {
-            csv += `${b.code},${b.name},${b.category},${b.litres},${b.amount},${b.advance},${b.net}\n`;
-        });
-
-        const blob = new Blob([csv], { type: "text/csv" });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = `${window.generatedBillType}_bill_${new Date().toISOString().slice(0, 10)}.csv`;
-        link.click();
-    });
-
-    // 🖨 Export to PDF
-    document.getElementById("exportPDFBtn").addEventListener("click", () => {
-        if (!window.generatedBills || window.generatedBills.length === 0) {
-            alert("No bills to export!");
-            return;
-        }
-
-        const content = document.getElementById("billSummaryContainer").innerHTML;
-        const win = window.open("", "_blank");
-        win.document.write(`
-    <html>
-      <head>
-        <title>${window.generatedBillType === "weekly" ? "Weekly" : "Monthly"} Bill Report</title>
-        <style>
-          body { font-family: Arial, sans-serif; margin: 20px; }
-          table { width: 100%; border-collapse: collapse; }
-          th, td { border: 1px solid #999; padding: 6px; text-align: center; }
-          th { background: #eee; }
-          h3 { text-align: center; color: #4B0082; }
-        </style>
-      </head>
-      <body>
-        <h3>${window.generatedBillType === "weekly" ? "Weekly" : "Monthly"} Farmer Bill</h3>
-        ${content}
-        <p style="text-align:center;margin-top:20px;">Generated on: ${new Date().toLocaleString()}</p>
-      </body>
-    </html>
-  `);
-        win.document.close();
-        win.print();
-    });
-
 }
+
 
 function renderBillTable(bills, bill_type) {
     let html = `
@@ -1119,6 +1189,7 @@ function renderBillTable(bills, bill_type) {
 function renderBillTable(bills, bill_type) {
     let html = `
     <h4>${bill_type === "weekly" ? "Weekly" : "Monthly"} Bill Summary</h4>
+    <div style="max-height:350px; overflow-y:auto;"> 
     <table id="billTable">
       <thead>
         <tr>
@@ -1131,31 +1202,275 @@ function renderBillTable(bills, bill_type) {
           <th>Net Payable</th>
         </tr>
       </thead>
-      <tbody>
-  `;
+      <tbody id="billTableBody">
+    `;
 
     bills.forEach(b => {
         html += `
-      <tr>
-        <td>${b.code}</td>
-        <td>${b.name}</td>
-        <td>${b.category}</td>
-        <td>${Number(b.litres).toFixed(2)}</td>
-        <td>₹${Number(b.amount).toFixed(2)}</td>
-        <td>₹${Number(b.advance).toFixed(2)}</td>
-        <td><b>₹${Number(b.net).toFixed(2)}</b></td>
-      </tr>
-    `;
+        <tr class="bill-row" data-code="${b.code}" data-name="${b.name}" data-category="${b.category}">
+            <td>${b.code}</td>
+            <td>${b.name}</td>
+            <td>${b.category}</td>
+            <td>${Number(b.litres).toFixed(2)}</td>
+            <td>₹${Number(b.amount).toFixed(2)}</td>
+            <td>₹${Number(b.advance).toFixed(2)}</td>
+            <td><b>₹${Number(b.net).toFixed(2)}</b></td>
+        </tr>`;
     });
 
-    html += "</tbody></table>";
+    html += `</tbody></table></div>`;
+
     document.getElementById("billSummaryContainer").innerHTML = html;
     document.getElementById("billExportButtons").style.display = "block";
 
-    // 🧾 Store for export
+    // Enable click on farmer row
+    document.querySelectorAll(".bill-row").forEach(row => {
+        row.style.cursor = "pointer";
+        row.addEventListener("click", () => {
+            openIndividualBill(row.dataset.code, row.dataset.name, row.dataset.category);
+        });
+    });
+
     window.generatedBills = bills;
     window.generatedBillType = bill_type;
 }
+
+async function openIndividualBill(code, name, category) {
+    const start_date = document.getElementById("bill_start").value;
+    const end_date = document.getElementById("bill_end").value;
+
+    const res = await callApi("get_individual_bill", { code, start_date, end_date });
+
+    if (!res.success) {
+        alert("Failed to load bill: " + res.message);
+        return;
+    }
+
+    const data = res.data;
+    let recordsHTML = "";
+
+    data.records.forEach(r => {
+        recordsHTML += `
+        <tr>
+            <td>${r.rec_date}</td>
+            <td>${r.shift}</td>
+            <td>${Number(r.litres).toFixed(2)}</td>
+            <td>${Number(r.fat).toFixed(1)}</td>
+            <td>${Number(r.snf).toFixed(1)}</td>
+            <td>₹${Number(r.rate).toFixed(2)}</td>
+            <td>₹${Number(r.amount).toFixed(2)}</td>
+        </tr>`;
+    });
+
+    const html = `
+    <div style="margin:20px;">
+        <h2 style="text-align:center;">Varad Dairy</h2>
+        <h3 style="text-align:center;">Farmer Milk Bill</h3>
+        <p style="text-align:center;">Period: ${start_date} → ${end_date}</p>
+
+        <p><b>Farmer Code:</b> ${code}</p>
+        <p><b>Name:</b> ${name}</p>
+        <p><b>Category:</b> ${category}</p>
+
+        <table border="1" cellspacing="0" cellpadding="6" style="width:100%; margin-top:15px; border-collapse:collapse; text-align:center;">
+            <tr><th>Date</th><th>Shift</th><th>Litres</th><th>Fat</th><th>SNF</th><th>Rate</th><th>Amount</th></tr>
+            ${recordsHTML}
+            <tr style="font-weight:bold;background:#f3e9ff;">
+                <td colspan="2">Total</td>
+                <td>${data.total_litres.toFixed(2)} L</td>
+                <td colspan="2"></td>
+                <td colspan="2">₹${data.total_amount.toFixed(2)}</td>
+            </tr>
+            <tr style="font-weight:bold;background:#f3e9ff;">
+                <td colspan="5">Advance Deducted</td>
+                <td colspan="2">₹${data.total_advance.toFixed(2)}</td>
+            </tr>
+            <tr style="font-weight:bold;background:#e8d7ff;">
+                <td colspan="5">Net Payable</td>
+                <td colspan="2">₹${data.net.toFixed(2)}</td>
+            </tr>
+        </table>
+
+        <p style="text-align:center;margin-top:20px;">Generated on: ${new Date().toLocaleString()}</p>
+    </div>`;
+
+    printIndividualBillIframe(html);
+}
+
+
+function printIndividualBillIframe(htmlContent) {
+    const iframe = document.createElement("iframe");
+    iframe.style.position = "fixed";
+    iframe.style.right = "0";
+    iframe.style.bottom = "0";
+    iframe.style.width = "0";
+    iframe.style.height = "0";
+    iframe.style.border = "0";
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentWindow.document;
+    doc.open();
+    doc.write(`
+        <html>
+        <head>
+            <style>
+                body { font-family: 'Segoe UI', Arial, sans-serif; padding: 20px; }
+                table { width: 100%; border-collapse: collapse; }
+                th, td { border: 1px solid #999; padding: 8px; text-align: center; }
+                th { background: #f3e9ff; color: #4B0082; }
+                h2, h3 { text-align:center; margin: 5px; color: #4B0082; }
+            </style>
+        </head>
+        <body>${htmlContent}</body>
+        </html>
+    `);
+    doc.close();
+
+    iframe.onload = () => {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+        setTimeout(() => document.body.removeChild(iframe), 500);
+    };
+}
+
+
+function renderIndividualBill(data, info) {
+    let milkRows = "";
+    data.milk.forEach(m => {
+        milkRows += `
+        <tr>
+            <td>${m.rec_date}</td>
+            <td>${m.litres.toFixed(2)}</td>
+            <td>${m.fat}</td>
+            <td>${m.snf}</td>
+            <td>${m.rate.toFixed(2)}</td>
+            <td>${m.amount.toFixed(2)}</td>
+        </tr>`;
+    });
+
+    let advRows = "";
+    data.advances.forEach(a => {
+        advRows += `
+        <tr>
+            <td>${a.date}</td>
+            <td>${a.remarks}</td>
+            <td>${a.amount.toFixed(2)}</td>
+        </tr>`;
+    });
+
+    document.getElementById("billSummaryContainer").innerHTML = `
+        <h3 style="text-align:center;">Farmer Bill</h3>
+        <p style="text-align:center;"><b>${info.name} (${info.code})</b> | Category: ${info.category}</p>
+        <p style="text-align:center;">Period: ${info.start_date} to ${info.end_date}</p>
+        
+        <h4>Milk Records</h4>
+        <table class="scrollTable">
+            <thead><tr>
+                <th>Date</th><th>Litres</th><th>Fat</th><th>SNF</th><th>Rate</th><th>Amount</th>
+            </tr></thead>
+            <tbody>${milkRows}</tbody>
+        </table>
+
+        <h4>Advance Records</h4>
+        <table class="scrollTable">
+            <thead><tr>
+                <th>Date</th><th>Remarks</th><th>Amount</th>
+            </tr></thead>
+            <tbody>${advRows}</tbody>
+        </table>
+
+        <h4 style="margin-top:15px;">Totals</h4>
+        <p>Total Litres: <b>${data.total_litres.toFixed(2)}</b> L</p>
+        <p>Total Amount: <b>₹${data.total_amount.toFixed(2)}</b></p>
+        <p>Total Advances: <b>₹${data.total_advances.toFixed(2)}</b></p>
+        <p style="font-size:18px;font-weight:bold;">Net Payable: <b>₹${data.net.toFixed(2)}</b></p>
+    `;
+
+    document.getElementById("billExportButtons").style.display = "block";
+    window.generatedBillData = data;
+    window.generatedBillInfo = info;
+
+    // document.getElementById("billExportButtons").style.display = "block";
+
+}
+
+document.getElementById("exportPDFBtn").addEventListener("click", () => {
+    if (!window.generatedBillData) {
+        alert("No individual bill to export!");
+        return;
+    }
+
+    const d = window.generatedBillData;
+    const p = window.generatedBillInfo;
+
+    let milkRows = "";
+    d.milk.forEach(m => {
+        milkRows += `<tr>
+            <td>${m.rec_date}</td>
+            <td>${m.litres.toFixed(2)}</td>
+            <td>${m.fat}</td>
+            <td>${m.snf}</td>
+            <td>${m.rate}</td>
+            <td>${m.amount.toFixed(2)}</td>
+        </tr>`;
+    });
+
+    let advRows = "";
+    d.advances.forEach(a => {
+        advRows += `<tr>
+            <td>${a.date}</td>
+            <td>${a.remarks}</td>
+            <td>${a.amount.toFixed(2)}</td>
+        </tr>`;
+    });
+
+    const win = window.open("", "_blank");
+    win.document.write(`
+      <html>
+      <head>
+        <title>Bill - ${p.name} (${p.code})</title>
+        <style>
+          body { font-family: Arial; margin: 30px; }
+          table { width: 100%; border-collapse: collapse; margin-top:10px; }
+          th, td { border: 1px solid #999; padding: 8px; text-align: center; }
+          th { background: #eee; }
+          h3, h2 { text-align:center; }
+        </style>
+      </head>
+      <body>
+        <h2>Shree Ganesh Dairy</h2>
+        <h3>Farmer Bill Report</h3>
+        <p style="text-align:center;">${p.name} (${p.code}) | ${p.category}</p>
+        <p style="text-align:center;">Period: <b>${p.start_date}</b> to <b>${p.end_date}</b></p>
+
+        <h4>Milk Records</h4>
+        <table>
+          <tr><th>Date</th><th>Litres</th><th>Fat</th><th>SNF</th><th>Rate</th><th>Amount</th></tr>
+          ${milkRows}
+        </table>
+
+        <h4>Advance Records</h4>
+        <table>
+          <tr><th>Date</th><th>Remarks</th><th>Amount</th></tr>
+          ${advRows}
+        </table>
+
+        <h3 style="margin-top:20px;">Totals</h3>
+        <p>Total Litres: <b>${d.total_litres.toFixed(2)}</b> L</p>
+        <p>Total Amount: <b>₹${d.total_amount.toFixed(2)}</b></p>
+        <p>Total Advances: <b>₹${d.total_advances.toFixed(2)}</b></p>
+        <p><b>Net Payable:</b> <b>₹${d.net.toFixed(2)}</b></p>
+
+        <p style="margin-top:40px;text-align:center;">Generated on: ${new Date().toLocaleString()}</p>
+      </body>
+      </html>
+    `);
+
+    win.document.close();
+    win.print();
+});
+
+
 
 function bindGenerateReportPopup() {
     const popup = document.getElementById("generateReportPopup");
@@ -1212,68 +1527,68 @@ function renderGeneratedReport(data, start_date, end_date) {
     window.generatedReportPeriod = { start_date, end_date };
 }
 
+// function enableReportExportButtons() {
+//     document.getElementById("reportExportButtons").style.display = "block";
+//     document.getElementById("exportReportPDFBtn").disabled = false;
+// }
 
-document.getElementById("exportReportPDFBtn").addEventListener("click", async () => {
+document.getElementById("exportReportPDFBtn").addEventListener("click", () => {
     if (!window.generatedReportData) {
         alert("No report generated yet!");
         return;
     }
 
     const p = window.generatedReportPeriod;
-    const d = window.generatedReportData;
-    const content = `
-    <div style="text-align:center; margin-bottom: 20px;">
-      <img src="assets/logo.png" alt="Dairy Logo" style="width:80px; height:auto; margin-bottom:10px;">
-      <h2 style="margin:5px; color:#4B0082;">Shree Ganesh Dairy</h2>
-      <p style="margin:0; color:#555;">123 Village Road, Sangli, Maharashtra<br>
-      Contact: +91 98765 43210 | Email: info@shreeganeshdairy.in</p>
-      <hr style="border:none; border-top:2px solid #4B0082; margin-top:15px;">
-    </div>
+    const reportHTML = document.getElementById("generatedReportContainer").innerHTML.trim();
 
-    <h3 style="text-align:center; color:#4B0082; margin-bottom:5px;">📊 Dairy Summary Report</h3>
-    <p style="text-align:center; color:#444; margin-bottom:15px;">Period: <b>${p.start_date}</b> to <b>${p.end_date}</b></p>
+    const finalHTML = `
+        <html>
+        <head>
+            <title>Dairy Report</title>
+            <style>
+                body { font-family: 'Segoe UI', Arial, sans-serif; padding: 20px; }
+                h2, h3 { text-align:center; }
+                table { width:100%; border-collapse: collapse; margin-top: 10px; }
+                th, td { border: 1px solid #888; padding: 8px; text-align:center; }
+                th { background:#efe1ff; color:#4B0082; font-weight:bold; }
+            </style>
+        </head>
+        <body>
+            <h2>Shree Ganesh Dairy</h2>
+            <h3>📊 Dairy Summary Report</h3>
+            <p style="text-align:center;">Period: <b>${p.start_date}</b> to <b>${p.end_date}</b></p>
 
-    <table style="width:100%; border-collapse: collapse;">
-      <tr><th>Section</th><th>Quantity</th><th>Amount (₹)</th></tr>
-      <tr><td>🥛 Milk Collected</td><td>${d.milk_litres.toFixed(2)} L</td><td>${d.milk_amount.toFixed(2)}</td></tr>
-      <tr><td>💵 Sales</td><td>${d.sale_litres.toFixed(2)} L</td><td>${d.sale_amount.toFixed(2)}</td></tr>
-      <tr><td>💰 Advances</td><td colspan="2">${d.total_advances.toFixed(2)}</td></tr>
-      <tr style="font-weight:bold; background:#f3e9ff;"><td>🧾 Net Income</td><td colspan="2">${d.net_income.toFixed(2)}</td></tr>
-    </table>
+            ${reportHTML}
 
-    <br><br>
-    <div style="display:flex; justify-content:space-between; align-items:center; font-size:14px;">
-      <div>
-        <p><b>Prepared By:</b><br>Shree Ganesh Dairy Admin</p>
-      </div>
-      <div style="text-align:right;">
-        <p><b>Date:</b> ${new Date().toLocaleDateString()}<br>
-        <b>Time:</b> ${new Date().toLocaleTimeString()}</p>
-      </div>
-    </div>
+            <p style="text-align:center;margin-top:20px;">
+                Generated: ${new Date().toLocaleString()}
+            </p>
+        </body>
+        </html>
+    `;
 
-    <hr style="margin-top:30px; border:none; border-top:1px dashed #999;">
-    <p style="text-align:center; color:#666; font-size:12px; margin-top:10px;">
-      Thank you for using Shree Ganesh Dairy Software © ${new Date().getFullYear()}
-    </p>
-  `;
+    // Create hidden iframe
+    const iframe = document.createElement("iframe");
+    iframe.style.position = "fixed";
+    iframe.style.right = "0";
+    iframe.style.bottom = "0";
+    iframe.style.width = "0";
+    iframe.style.height = "0";
+    iframe.style.border = "0";
 
-    const win = window.open("", "_blank");
-    win.document.write(`
-    <html>
-      <head>
-        <title>Dairy Report ${p.start_date} to ${p.end_date}</title>
-        <style>
-          body { font-family: 'Segoe UI', Arial, sans-serif; margin: 40px; }
-          table { border: 1px solid #999; }
-          th, td { border: 1px solid #999; padding: 8px; text-align: center; }
-          th { background: #f3e9ff; color: #4B0082; }
-        </style>
-      </head>
-      <body>${content}</body>
-    </html>
-  `);
-    win.document.close();
-    win.print();
+    document.body.appendChild(iframe);
+
+    const iframeDoc = iframe.contentWindow || iframe.contentDocument;
+    iframeDoc.document.open();
+    iframeDoc.document.write(finalHTML);
+    iframeDoc.document.close();
+
+    iframe.onload = function () {
+        iframeDoc.focus();
+        iframeDoc.print();
+        setTimeout(() => document.body.removeChild(iframe), 1500);
+    };
 });
+
+
 
