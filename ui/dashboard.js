@@ -1554,7 +1554,7 @@ document.getElementById("exportReportPDFBtn").addEventListener("click", () => {
             </style>
         </head>
         <body>
-            <h2>Shree Ganesh Dairy</h2>
+            <h2> Varad Dairy</h2>
             <h3>📊 Dairy Summary Report</h3>
             <p style="text-align:center;">Period: <b>${p.start_date}</b> to <b>${p.end_date}</b></p>
 
